@@ -53,6 +53,43 @@ class MainScreen extends StatelessWidget {
     'Text-To-Speech',
   ];
 
+  void _setQueue() async {
+    await _audioHandler.switchToHandler(1);
+    const albumsRootId = 'albums';
+    final items = <String, List<MediaItem>>{
+      AudioService.browsableRootId: const [
+        MediaItem(
+          id: albumsRootId,
+          album: "",
+          title: "Albums",
+          playable: false,
+        ),
+      ],
+      albumsRootId: [
+        MediaItem(
+          id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
+          album: "Science Friday",
+          title: "A Salute To Head-Scratching Science",
+          artist: "Science Friday and WNYC Studios",
+          duration: const Duration(milliseconds: 5739820),
+          artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+        ),
+        MediaItem(
+          id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
+          album: "Science Friday",
+          title: "From Cat Rheology To Operatic Incompetence",
+          artist: "Science Friday and WNYC Studios",
+          duration: const Duration(milliseconds: 2856950),
+          artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+        ),
+      ],
+    };
+
+    for (MediaItem mediaItem in items[albumsRootId]!) {
+      await _audioHandler.addQueueItem(mediaItem);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,6 +127,7 @@ class MainScreen extends StatelessWidget {
                         );
                       },
                     ),
+                    TextButton(onPressed: _setQueue, child: Text("set secondary queue")),
                     if (queue.isNotEmpty)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -761,7 +799,7 @@ class MediaLibrary {
         artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
       ),
       MediaItem(
-        id: 'https://how-to-think-courses.s3.amazonaws.com/0qcdwev7xdtowx78cmp3axzfews2',
+        id: 'https://how-to-think-courses.s3.amazonaws.com/jvnrwt86mq0jh0ynnjwg8xcbhsym',
         album: "Science Friday",
         title: "From Cat Rheology To Operatic Incompetence",
         artist: "Science Friday and WNYC Studios",
@@ -772,38 +810,38 @@ class MediaLibrary {
   };
 }
 
-class MediaLibrary2 {
-  static const albumsRootId = 'albums';
-
-  final items = <String, List<MediaItem>>{
-    AudioService.browsableRootId: const [
-      MediaItem(
-        id: albumsRootId,
-        album: "",
-        title: "Albums",
-        playable: false,
-      ),
-    ],
-    albumsRootId: [
-      MediaItem(
-        id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-        album: "Science Friday",
-        title: "A Salute To Head-Scratching Science",
-        artist: "Science Friday and WNYC Studios",
-        duration: const Duration(milliseconds: 5739820),
-        artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
-      ),
-      MediaItem(
-        id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-        album: "Science Friday",
-        title: "From Cat Rheology To Operatic Incompetence",
-        artist: "Science Friday and WNYC Studios",
-        duration: const Duration(milliseconds: 2856950),
-        artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
-      ),
-    ],
-  };
-}
+// class MediaLibrary2 {
+//   static const albumsRootId = 'albums';
+//
+//   final items = <String, List<MediaItem>>{
+//     AudioService.browsableRootId: const [
+//       MediaItem(
+//         id: albumsRootId,
+//         album: "",
+//         title: "Albums",
+//         playable: false,
+//       ),
+//     ],
+//     albumsRootId: [
+//       MediaItem(
+//         id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
+//         album: "Science Friday",
+//         title: "A Salute To Head-Scratching Science",
+//         artist: "Science Friday and WNYC Studios",
+//         duration: const Duration(milliseconds: 5739820),
+//         artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+//       ),
+//       MediaItem(
+//         id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
+//         album: "Science Friday",
+//         title: "From Cat Rheology To Operatic Incompetence",
+//         artist: "Science Friday and WNYC Studios",
+//         duration: const Duration(milliseconds: 2856950),
+//         artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+//       ),
+//     ],
+//   };
+// }
 
 /// This task defines logic for speaking a sequence of numbers using
 /// text-to-speech.
@@ -811,7 +849,7 @@ class MediaLibrary2 {
 class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   // ignore: close_sinks
   final BehaviorSubject<List<MediaItem>> _recentSubject = BehaviorSubject<List<MediaItem>>();
-  final _mediaLibrary = MediaLibrary2();
+  // final _mediaLibrary = MediaLibrary2();
   final _player = AudioPlayer();
 
   int? get index => _player.currentIndex;
@@ -822,7 +860,7 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
 
   Future<void> _init() async {
     // Load and broadcast the queue
-    queue.add(_mediaLibrary.items[MediaLibrary.albumsRootId]);
+    //queue.add(_mediaLibrary.items[MediaLibrary.albumsRootId]);
     // For Android 11, record the most recent item so it can be resumed.
     mediaItem.whereType<MediaItem>().listen((item) => _recentSubject.add([item]));
     // Broadcast media item changes.
@@ -850,31 +888,30 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
     }
   }
 
-  @override
-  Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
-    switch (parentMediaId) {
-      case AudioService.recentRootId:
-        // When the user resumes a media session, tell the system what the most
-        // recently played item was.
-        print("### get recent children: ${_recentSubject.value}:");
-        return _recentSubject.value ?? [];
-      default:
-        // Allow client to browse the media library.
-        print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
-        return _mediaLibrary.items[parentMediaId]!;
-    }
-  }
-
-  @override
-  ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
-    switch (parentMediaId) {
-      case AudioService.recentRootId:
-        return _recentSubject.map((_) => <String, dynamic>{});
-      default:
-        return Stream.value(_mediaLibrary.items[parentMediaId]).map((_) => <String, dynamic>{})
-            as ValueStream<Map<String, dynamic>>;
-    }
-  }
+  // @override
+  // Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
+  //   switch (parentMediaId) {
+  //     case AudioService.recentRootId:
+  //       // When the user resumes a media session, tell the system what the most
+  //       // recently played item was.
+  //       print("### get recent children: ${_recentSubject.value}:");
+  //       return _recentSubject.value ?? [];
+  //     default:
+  //       // Allow client to browse the media library.
+  //       //  print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
+  //       return _recentSubject.value ?? [];
+  //   }
+  // }
+  //
+  // @override
+  // ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
+  //   switch (parentMediaId) {
+  //     case AudioService.recentRootId:
+  //       return _recentSubject.map((_) => <String, dynamic>{});
+  //     default:
+  //       return _recentSubject.map((_) => <String, dynamic>{});
+  //   }
+  // }
 
   @override
   Future<void> skipToQueueItem(int index) async {
