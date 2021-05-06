@@ -88,9 +88,16 @@ class MainScreen extends StatelessWidget {
     // for (MediaItem mediaItem in items[albumsRootId]!) {
     //     _audioHandler.addQueueItem(mediaItem);
     // }
-
-    _audioHandler.addQueueItems(items[albumsRootId]!);
-    //AudioServiceBackground.setMediaItem(items[albumsRootId]![0]);
+    //AudioService.queue!.items[albumsRootId]!);
+    await _audioHandler.updateQueue(items[albumsRootId]!);
+    await _audioHandler.skipToQueueItem(0);
+    await Future.delayed(const Duration(seconds: 2), () => "2");
+    var media = await _audioHandler.queue.first;
+    print("::::::::::::::::::::::::::::::::::::::::::");
+    print(media!.first);
+    print("::::::::::::::::::::::::::::::::::::::::::");
+    AudioServiceBackground.setMediaItem(items[albumsRootId]![0]);
+    await _audioHandler.playMediaItem(media.first);
   }
 
   @override
@@ -899,30 +906,30 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
     }
   }
 
-  @override
-  Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
-    switch (parentMediaId) {
-      case AudioService.recentRootId:
-        // When the user resumes a media session, tell the system what the most
-        // recently played item was.
-        print("### get recent children: ${_recentSubject.value}:");
-        return _recentSubject.value ?? [];
-      default:
-        // Allow client to browse the media library.
-        // print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
-        return _recentSubject.value ?? [];
-    }
-  }
-
-  @override
-  ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
-    switch (parentMediaId) {
-      case AudioService.recentRootId:
-        return _recentSubject.map((_) => <String, dynamic>{});
-      default:
-        return _recentSubject.map((_) => <String, dynamic>{});
-    }
-  }
+  // @override
+  // Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
+  //   switch (parentMediaId) {
+  //     case AudioService.recentRootId:
+  //       // When the user resumes a media session, tell the system what the most
+  //       // recently played item was.
+  //       print("### get recent children: ${_recentSubject.value}:");
+  //       return _recentSubject.value ?? [];
+  //     default:
+  //       // Allow client to browse the media library.
+  //       // print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
+  //       return _recentSubject.value ?? [];
+  //   }
+  // }
+  //
+  // @override
+  // ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
+  //   switch (parentMediaId) {
+  //     case AudioService.recentRootId:
+  //       return _recentSubject.map((_) => <String, dynamic>{});
+  //     default:
+  //       return _recentSubject.map((_) => <String, dynamic>{});
+  //   }
+  // }
 
   @override
   Future<void> skipToQueueItem(int index) async {
