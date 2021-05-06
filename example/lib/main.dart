@@ -55,20 +55,20 @@ class MainScreen extends StatelessWidget {
 
   void _setQueue() async {
     await _audioHandler.switchToHandler(1);
-    const albumsRootId = 'albums';
+    const albumsRootId = 'new';
     final items = <String, List<MediaItem>>{
       AudioService.browsableRootId: const [
         MediaItem(
           id: albumsRootId,
           album: "",
-          title: "Albums",
+          title: "new",
           playable: false,
         ),
       ],
       albumsRootId: [
         MediaItem(
           id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-          album: "Science Friday",
+          album: "Science Fridasssy",
           title: "A Salute To Head-Scratching Science",
           artist: "Science Friday and WNYC Studios",
           duration: const Duration(milliseconds: 5739820),
@@ -76,7 +76,7 @@ class MainScreen extends StatelessWidget {
         ),
         MediaItem(
           id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-          album: "Science Friday",
+          album: "Science Fridssssay",
           title: "From Cat Rheology To Operatic Incompetence",
           artist: "Science Friday and WNYC Studios",
           duration: const Duration(milliseconds: 2856950),
@@ -85,9 +85,12 @@ class MainScreen extends StatelessWidget {
       ],
     };
 
-    for (MediaItem mediaItem in items[albumsRootId]!) {
-      await _audioHandler.addQueueItem(mediaItem);
-    }
+    // for (MediaItem mediaItem in items[albumsRootId]!) {
+    //     _audioHandler.addQueueItem(mediaItem);
+    // }
+
+    _audioHandler.addQueueItems(items[albumsRootId]!);
+    //AudioServiceBackground.setMediaItem(items[albumsRootId]![0]);
   }
 
   @override
@@ -144,6 +147,9 @@ class MainScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                    Text(mediaItem.toString()),
+                    Text(":::::::::::::::::::::::::::::::::"),
+                    queueState != null ? Text(queueState.mediaItem.toString()) : Text(snapshot.data.toString()),
                     if (mediaItem?.title != null) Text(mediaItem!.title),
                   ],
                 );
@@ -225,10 +231,12 @@ class MainScreen extends StatelessWidget {
       );
 
   IconButton playButton() => IconButton(
-        icon: Icon(Icons.play_arrow),
-        iconSize: 64.0,
-        onPressed: _audioHandler.play,
-      );
+      icon: Icon(Icons.play_arrow),
+      iconSize: 64.0,
+      onPressed: () {
+        // _audioHandler.switchToHandler(1);
+        _audioHandler.play();
+      });
 
   IconButton pauseButton() => IconButton(
         icon: Icon(Icons.pause),
@@ -360,7 +368,10 @@ class MainSwitchHandler extends SwitchAudioHandler {
 
 class LoggingAudioHandler extends CompositeAudioHandler {
   LoggingAudioHandler(AudioHandler inner) : super(inner) {
-    playbackState.listen((state) {
+    playbackState.listen((state) async {
+      queue.forEach((element) {
+        _log('playbackState :::::::::::::::: changed: $element');
+      });
       _log('playbackState changed: $state');
     });
     queue.listen((queue) {
@@ -849,7 +860,7 @@ class MediaLibrary {
 class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   // ignore: close_sinks
   final BehaviorSubject<List<MediaItem>> _recentSubject = BehaviorSubject<List<MediaItem>>();
-  // final _mediaLibrary = MediaLibrary2();
+  // final _mediaLibrary = MediaLibrary();
   final _player = AudioPlayer();
 
   int? get index => _player.currentIndex;
@@ -878,7 +889,7 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
       // After a cold restart (on Android), _player.load jumps straight from
       // the loading state to the completed state. Inserting a delay makes it
       // work. Not sure why!
-      //await Future.delayed(Duration(seconds: 2)); // magic delay
+      // await Future.delayed(Duration(seconds: 2)); // magic delay
       await _player.setAudioSource(ConcatenatingAudioSource(
         children: queue.value!.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
       ));
@@ -888,30 +899,30 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
     }
   }
 
-  // @override
-  // Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
-  //   switch (parentMediaId) {
-  //     case AudioService.recentRootId:
-  //       // When the user resumes a media session, tell the system what the most
-  //       // recently played item was.
-  //       print("### get recent children: ${_recentSubject.value}:");
-  //       return _recentSubject.value ?? [];
-  //     default:
-  //       // Allow client to browse the media library.
-  //       //  print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
-  //       return _recentSubject.value ?? [];
-  //   }
-  // }
-  //
-  // @override
-  // ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
-  //   switch (parentMediaId) {
-  //     case AudioService.recentRootId:
-  //       return _recentSubject.map((_) => <String, dynamic>{});
-  //     default:
-  //       return _recentSubject.map((_) => <String, dynamic>{});
-  //   }
-  // }
+  @override
+  Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
+    switch (parentMediaId) {
+      case AudioService.recentRootId:
+        // When the user resumes a media session, tell the system what the most
+        // recently played item was.
+        print("### get recent children: ${_recentSubject.value}:");
+        return _recentSubject.value ?? [];
+      default:
+        // Allow client to browse the media library.
+        // print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
+        return _recentSubject.value ?? [];
+    }
+  }
+
+  @override
+  ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
+    switch (parentMediaId) {
+      case AudioService.recentRootId:
+        return _recentSubject.map((_) => <String, dynamic>{});
+      default:
+        return _recentSubject.map((_) => <String, dynamic>{});
+    }
+  }
 
   @override
   Future<void> skipToQueueItem(int index) async {
