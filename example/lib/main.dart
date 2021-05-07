@@ -54,7 +54,8 @@ class MainScreen extends StatelessWidget {
   ];
 
   void _setQueue() async {
-    await _audioHandler.switchToHandler(1);
+    //await _audioHandler.switchToHandler(1);
+    await Future.delayed(const Duration(seconds: 2), () => "2");
     const albumsRootId = 'new';
     final items = <String, List<MediaItem>>{
       AudioService.browsableRootId: const [
@@ -90,14 +91,14 @@ class MainScreen extends StatelessWidget {
     // }
     //AudioService.queue!.items[albumsRootId]!);
     await _audioHandler.updateQueue(items[albumsRootId]!);
-    await _audioHandler.skipToQueueItem(0);
+    // await _audioHandler.skipToQueueItem(0);
     await Future.delayed(const Duration(seconds: 2), () => "2");
     var media = await _audioHandler.queue.first;
     print("::::::::::::::::::::::::::::::::::::::::::");
     print(media!.first);
     print("::::::::::::::::::::::::::::::::::::::::::");
-    AudioServiceBackground.setMediaItem(items[albumsRootId]![0]);
-    await _audioHandler.playMediaItem(media.first);
+    //AudioServiceBackground.setMediaItem(items[albumsRootId]![0]);
+    //await _audioHandler.playMediaItem(media.first);
   }
 
   @override
@@ -828,38 +829,38 @@ class MediaLibrary {
   };
 }
 
-// class MediaLibrary2 {
-//   static const albumsRootId = 'albums';
-//
-//   final items = <String, List<MediaItem>>{
-//     AudioService.browsableRootId: const [
-//       MediaItem(
-//         id: albumsRootId,
-//         album: "",
-//         title: "Albums",
-//         playable: false,
-//       ),
-//     ],
-//     albumsRootId: [
-//       MediaItem(
-//         id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-//         album: "Science Friday",
-//         title: "A Salute To Head-Scratching Science",
-//         artist: "Science Friday and WNYC Studios",
-//         duration: const Duration(milliseconds: 5739820),
-//         artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
-//       ),
-//       MediaItem(
-//         id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-//         album: "Science Friday",
-//         title: "From Cat Rheology To Operatic Incompetence",
-//         artist: "Science Friday and WNYC Studios",
-//         duration: const Duration(milliseconds: 2856950),
-//         artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
-//       ),
-//     ],
-//   };
-// }
+class MediaLibrary2 {
+  static const albumsRootId = 'albums';
+
+  final items = <String, List<MediaItem>>{
+    AudioService.browsableRootId: const [
+      MediaItem(
+        id: albumsRootId,
+        album: "",
+        title: "Albums",
+        playable: false,
+      ),
+    ],
+    albumsRootId: [
+      MediaItem(
+        id: 'https://how-to-think-courses.s3.amazonaws.com/12s7hk2cilwsf6wqcwtviu1w6bp5',
+        album: "Science Friday",
+        title: "A Salute To Head-Scratching Scigence",
+        artist: "Science Friday and WNYC Studios",
+        duration: const Duration(milliseconds: 5739820),
+        artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+      ),
+      MediaItem(
+        id: ' https://how-to-think-courses.s3.amazonaws.com/xgmw34wl05sy1y1i2enl19vifdz8',
+        album: "Science Friday",
+        title: "From Cat Rheology To Operatic Incompetence",
+        artist: "Science Friday and WNYC Studios",
+        duration: const Duration(milliseconds: 2856950),
+        artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+      ),
+    ],
+  };
+}
 
 /// This task defines logic for speaking a sequence of numbers using
 /// text-to-speech.
@@ -867,7 +868,7 @@ class MediaLibrary {
 class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   // ignore: close_sinks
   final BehaviorSubject<List<MediaItem>> _recentSubject = BehaviorSubject<List<MediaItem>>();
-  // final _mediaLibrary = MediaLibrary();
+  final _mediaLibrary = MediaLibrary();
   final _player = AudioPlayer();
 
   int? get index => _player.currentIndex;
@@ -878,7 +879,7 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
 
   Future<void> _init() async {
     // Load and broadcast the queue
-    //queue.add(_mediaLibrary.items[MediaLibrary.albumsRootId]);
+    queue.add(_mediaLibrary.items[MediaLibrary.albumsRootId]);
     // For Android 11, record the most recent item so it can be resumed.
     mediaItem.whereType<MediaItem>().listen((item) => _recentSubject.add([item]));
     // Broadcast media item changes.
@@ -896,7 +897,7 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
       // After a cold restart (on Android), _player.load jumps straight from
       // the loading state to the completed state. Inserting a delay makes it
       // work. Not sure why!
-      // await Future.delayed(Duration(seconds: 2)); // magic delay
+      //await Future.delayed(Duration(seconds: 2)); // magic delay
       await _player.setAudioSource(ConcatenatingAudioSource(
         children: queue.value!.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
       ));
@@ -906,30 +907,31 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
     }
   }
 
-  // @override
-  // Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
-  //   switch (parentMediaId) {
-  //     case AudioService.recentRootId:
-  //       // When the user resumes a media session, tell the system what the most
-  //       // recently played item was.
-  //       print("### get recent children: ${_recentSubject.value}:");
-  //       return _recentSubject.value ?? [];
-  //     default:
-  //       // Allow client to browse the media library.
-  //       // print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
-  //       return _recentSubject.value ?? [];
-  //   }
-  // }
-  //
-  // @override
-  // ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
-  //   switch (parentMediaId) {
-  //     case AudioService.recentRootId:
-  //       return _recentSubject.map((_) => <String, dynamic>{});
-  //     default:
-  //       return _recentSubject.map((_) => <String, dynamic>{});
-  //   }
-  // }
+  @override
+  Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
+    switch (parentMediaId) {
+      case AudioService.recentRootId:
+        // When the user resumes a media session, tell the system what the most
+        // recently played item was.
+        print("### get recent children: ${_recentSubject.value}:");
+        return _recentSubject.value ?? [];
+      default:
+        // Allow client to browse the media library.
+        print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
+        return _mediaLibrary.items[parentMediaId]!;
+    }
+  }
+
+  @override
+  ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
+    switch (parentMediaId) {
+      case AudioService.recentRootId:
+        return _recentSubject.map((_) => <String, dynamic>{});
+      default:
+        return Stream.value(_mediaLibrary.items[parentMediaId]).map((_) => <String, dynamic>{})
+            as ValueStream<Map<String, dynamic>>;
+    }
+  }
 
   @override
   Future<void> skipToQueueItem(int index) async {
