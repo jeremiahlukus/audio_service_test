@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_service_example/first_queue.dart';
+import 'package:audio_service_example/secondary_queue.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,18 +13,18 @@ import 'package:rxdart/rxdart.dart';
 
 // You might want to provide this using dependency injection rather than a
 // global variable.
-late AudioHandler _audioHandler;
+late AudioHandler audioHandler;
 
 /// Extension methods for our custom actions.
 extension DemoAudioHandler on AudioHandler {
   Future<void> switchToHandler(int? index) async {
     if (index == null) return;
-    await _audioHandler.customAction('switchToHandler', <String, dynamic>{'index': index});
+    await audioHandler.customAction('switchToHandler', <String, dynamic>{'index': index});
   }
 }
 
 Future<void> main() async {
-  _audioHandler = await AudioService.init(
+  audioHandler = await AudioService.init(
     builder: () => LoggingAudioHandler(MainSwitchHandler([
       AudioPlayerHandler(),
       TextPlayerHandler(),
@@ -47,57 +49,20 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   static const handlerNames = [
     'Audio Player',
     'Text-To-Speech',
   ];
 
-  void _setQueue() async {
-    await _audioHandler.switchToHandler(1);
-    const albumsRootId = 'new';
-    final items = <String, List<MediaItem>>{
-      AudioService.browsableRootId: const [
-        MediaItem(
-          id: albumsRootId,
-          album: "",
-          title: "new",
-          playable: false,
-        ),
-      ],
-      albumsRootId: [
-        MediaItem(
-          id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-          album: "Science Fridasssy",
-          title: "A Salute To Head-Scratching Science",
-          artist: "Science Friday and WNYC Studios",
-          duration: const Duration(milliseconds: 5739820),
-          artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
-        ),
-        MediaItem(
-          id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-          album: "Science Fridssssay",
-          title: "From Cat Rheology To Operatic Incompetence",
-          artist: "Science Friday and WNYC Studios",
-          duration: const Duration(milliseconds: 2856950),
-          artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
-        ),
-      ],
-    };
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
 
-    // for (MediaItem mediaItem in items[albumsRootId]!) {
-    //     _audioHandler.addQueueItem(mediaItem);
-    // }
-    //AudioService.queue!.items[albumsRootId]!);
-    await _audioHandler.updateQueue(items[albumsRootId]!);
-    await _audioHandler.skipToQueueItem(0);
-    await Future.delayed(const Duration(seconds: 2), () => "2");
-    var media = await _audioHandler.queue.first;
-    print("::::::::::::::::::::::::::::::::::::::::::");
-    print(media!.first);
-    print("::::::::::::::::::::::::::::::::::::::::::");
-    AudioServiceBackground.setMediaItem(items[albumsRootId]![0]);
-    await _audioHandler.playMediaItem(media.first);
+class _MainScreenState extends State<MainScreen> {
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -110,127 +75,29 @@ class MainScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Queue display/controls.
-            StreamBuilder<QueueState>(
-              stream: _queueStateStream,
-              builder: (context, snapshot) {
-                final queueState = snapshot.data;
-                final queue = queueState?.queue ?? const [];
-                final mediaItem = queueState?.mediaItem;
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    StreamBuilder<dynamic>(
-                      stream: _audioHandler.customState,
-                      builder: (context, snapshot) {
-                        final handlerIndex = (snapshot.data?.handlerIndex as int?) ?? 0;
-                        return DropdownButton<int>(
-                          value: handlerIndex,
-                          items: [
-                            for (var i = 0; i < handlerNames.length; i++)
-                              DropdownMenuItem<int>(
-                                value: i,
-                                child: Text(handlerNames[i]),
-                              ),
-                          ],
-                          onChanged: _audioHandler.switchToHandler,
-                        );
-                      },
-                    ),
-                    TextButton(onPressed: _setQueue, child: Text("set secondary queue")),
-                    if (queue.isNotEmpty)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.skip_previous),
-                            iconSize: 64.0,
-                            onPressed: mediaItem == queue.first ? null : _audioHandler.skipToPrevious,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.skip_next),
-                            iconSize: 64.0,
-                            onPressed: mediaItem == queue.last ? null : _audioHandler.skipToNext,
-                          ),
-                        ],
-                      ),
-                    Text(mediaItem.toString()),
-                    Text(":::::::::::::::::::::::::::::::::"),
-                    queueState != null ? Text(queueState.mediaItem.toString()) : Text(snapshot.data.toString()),
-                    if (mediaItem?.title != null) Text(mediaItem!.title),
-                  ],
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (context) => FirstQueue()),
                 );
               },
+              child: Text("First Queue"),
             ),
-            // Play/pause/stop buttons.
-            StreamBuilder<bool>(
-              stream: _audioHandler.playbackState.map((state) => state.playing).distinct(),
-              builder: (context, snapshot) {
-                final playing = snapshot.data ?? false;
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (playing) pauseButton() else playButton(),
-                    stopButton(),
-                  ],
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(builder: (context) => SecondaryQueue()),
                 );
               },
-            ),
-            // A seek bar.
-            StreamBuilder<MediaState>(
-              stream: _mediaStateStream,
-              builder: (context, snapshot) {
-                final mediaState = snapshot.data;
-                return SeekBar(
-                  duration: mediaState?.mediaItem?.duration ?? Duration.zero,
-                  position: mediaState?.position ?? Duration.zero,
-                  onChangeEnd: (newPosition) {
-                    _audioHandler.seek(newPosition);
-                  },
-                );
-              },
-            ),
-            // Display the processing state.
-            StreamBuilder<AudioProcessingState>(
-              stream: _audioHandler.playbackState.map((state) => state.processingState).distinct(),
-              builder: (context, snapshot) {
-                final processingState = snapshot.data ?? AudioProcessingState.idle;
-                return Text("Processing state: ${describeEnum(processingState)}");
-              },
-            ),
-            // Display the latest custom event.
-            StreamBuilder<dynamic>(
-              stream: _audioHandler.customEvent,
-              builder: (context, snapshot) {
-                return Text("custom event: ${snapshot.data}");
-              },
-            ),
-            // Display the notification click status.
-            StreamBuilder<bool>(
-              stream: AudioService.notificationClickEvent,
-              builder: (context, snapshot) {
-                return Text(
-                  'Notification Click Status: ${snapshot.data}',
-                );
-              },
+              child: Text("Second Queue"),
             ),
           ],
         ),
       ),
     );
   }
-
-  /// A stream reporting the combined state of the current media item and its
-  /// current position.
-  Stream<MediaState> get _mediaStateStream => Rx.combineLatest2<MediaItem?, Duration, MediaState>(
-      _audioHandler.mediaItem,
-      AudioService.getPositionStream(),
-      (mediaItem, position) => MediaState(mediaItem, position));
-
-  /// A stream reporting the combined state of the current queue and the current
-  /// media item within that queue.
-  Stream<QueueState> get _queueStateStream => Rx.combineLatest2<List<MediaItem>?, MediaItem?, QueueState>(
-      _audioHandler.queue, _audioHandler.mediaItem, (queue, mediaItem) => QueueState(queue, mediaItem));
 
   ElevatedButton startButton(String label, VoidCallback onPressed) => ElevatedButton(
         onPressed: onPressed,
@@ -242,19 +109,19 @@ class MainScreen extends StatelessWidget {
       iconSize: 64.0,
       onPressed: () {
         // _audioHandler.switchToHandler(1);
-        _audioHandler.play();
+        audioHandler.play();
       });
 
   IconButton pauseButton() => IconButton(
         icon: Icon(Icons.pause),
         iconSize: 64.0,
-        onPressed: _audioHandler.pause,
+        onPressed: audioHandler.pause,
       );
 
   IconButton stopButton() => IconButton(
         icon: Icon(Icons.stop),
         iconSize: 64.0,
-        onPressed: _audioHandler.stop,
+        onPressed: audioHandler.stop,
       );
 }
 
@@ -670,7 +537,7 @@ class LoggingAudioHandler extends CompositeAudioHandler {
 class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   // ignore: close_sinks
   final BehaviorSubject<List<MediaItem>> _recentSubject = BehaviorSubject<List<MediaItem>>();
-  final _mediaLibrary = MediaLibrary();
+  // final _mediaLibrary = MediaLibrary();
   final _player = AudioPlayer();
 
   int? get index => _player.currentIndex;
@@ -681,12 +548,12 @@ class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler
 
   Future<void> _init() async {
     // Load and broadcast the queue
-    queue.add(_mediaLibrary.items[MediaLibrary.albumsRootId]);
+    // queue.add(_mediaLibrary.items[MediaLibrary.albumsRootId]);
     // For Android 11, record the most recent item so it can be resumed.
     mediaItem.whereType<MediaItem>().listen((item) => _recentSubject.add([item]));
     // Broadcast media item changes.
     _player.currentIndexStream.listen((index) {
-      if (index != null) mediaItem.add(queue.value![index]);
+      if (index != null && queue.value!.isNotEmpty) mediaItem.add(queue.value![index]);
     });
     // Propagate all events from the audio player to AudioService clients.
     _player.playbackEventStream.listen(_broadcastState);
@@ -699,6 +566,7 @@ class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler
       // After a cold restart (on Android), _player.load jumps straight from
       // the loading state to the completed state. Inserting a delay makes it
       // work. Not sure why!
+      await Future.delayed(const Duration(seconds: 2), () => "2");
       //await Future.delayed(Duration(seconds: 2)); // magic delay
       await _player.setAudioSource(ConcatenatingAudioSource(
         children: queue.value!.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
@@ -709,31 +577,31 @@ class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     }
   }
 
-  @override
-  Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
-    switch (parentMediaId) {
-      case AudioService.recentRootId:
-        // When the user resumes a media session, tell the system what the most
-        // recently played item was.
-        print("### get recent children: ${_recentSubject.value}:");
-        return _recentSubject.value ?? [];
-      default:
-        // Allow client to browse the media library.
-        print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
-        return _mediaLibrary.items[parentMediaId]!;
-    }
-  }
-
-  @override
-  ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
-    switch (parentMediaId) {
-      case AudioService.recentRootId:
-        return _recentSubject.map((_) => <String, dynamic>{});
-      default:
-        return Stream.value(_mediaLibrary.items[parentMediaId]).map((_) => <String, dynamic>{})
-            as ValueStream<Map<String, dynamic>>;
-    }
-  }
+  // @override
+  // Future<List<MediaItem>> getChildren(String parentMediaId, [Map<String, dynamic>? options]) async {
+  //   switch (parentMediaId) {
+  //     case AudioService.recentRootId:
+  //       // When the user resumes a media session, tell the system what the most
+  //       // recently played item was.
+  //       print("### get recent children: ${_recentSubject.value}:");
+  //       return _recentSubject.value ?? [];
+  //     default:
+  //       // Allow client to browse the media library.
+  //       print("### get $parentMediaId children: ${_mediaLibrary.items[parentMediaId]}:");
+  //       return _mediaLibrary.items[parentMediaId]!;
+  //   }
+  // }
+  //
+  // @override
+  // ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) {
+  //   switch (parentMediaId) {
+  //     case AudioService.recentRootId:
+  //       return _recentSubject.map((_) => <String, dynamic>{});
+  //     default:
+  //       return Stream.value(_mediaLibrary.items[parentMediaId]).map((_) => <String, dynamic>{})
+  //           as ValueStream<Map<String, dynamic>>;
+  //   }
+  // }
 
   @override
   Future<void> skipToQueueItem(int index) async {
@@ -883,7 +751,7 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
     mediaItem.whereType<MediaItem>().listen((item) => _recentSubject.add([item]));
     // Broadcast media item changes.
     _player.currentIndexStream.listen((index) {
-      if (index != null) mediaItem.add(queue.value![index]);
+      if (index != null && queue.value!.isNotEmpty) mediaItem.add(queue.value![index]);
     });
     // Propagate all events from the audio player to AudioService clients.
     _player.playbackEventStream.listen(_broadcastState);
@@ -896,7 +764,7 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
       // After a cold restart (on Android), _player.load jumps straight from
       // the loading state to the completed state. Inserting a delay makes it
       // work. Not sure why!
-      // await Future.delayed(Duration(seconds: 2)); // magic delay
+      await Future.delayed(const Duration(seconds: 2), () => "2");
       await _player.setAudioSource(ConcatenatingAudioSource(
         children: queue.value!.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
       ));
