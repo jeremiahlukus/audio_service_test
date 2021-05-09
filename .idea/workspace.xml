@@ -4,8 +4,7 @@
     <list default="true" id="4ca935c5-cac2-4024-aa58-086565be6618" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/audio_service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/audio_service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/audio_service/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/audio_service/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,34 +52,34 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1638" height="292" key="GridCell.Tab.0.bottom" timestamp="1620503439531">
+    <state width="1638" height="292" key="GridCell.Tab.0.bottom" timestamp="1620510101466">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
-    <state width="1638" height="292" key="GridCell.Tab.0.bottom/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@0.23.1680.1027" timestamp="1620503439531" />
+    <state width="1638" height="292" key="GridCell.Tab.0.bottom/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@0.23.1680.1027" timestamp="1620510101466" />
     <state width="2518" height="442" key="GridCell.Tab.0.bottom/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@836.-1417.2560.1417" timestamp="1620275464225" />
     <state width="1638" height="292" key="GridCell.Tab.0.bottom/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1002@0.23.1680.1002" timestamp="1620500571604" />
     <state width="2518" height="442" key="GridCell.Tab.0.bottom/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1002@836.-1417.2560.1417" timestamp="1620354337718" />
     <state width="2518" height="442" key="GridCell.Tab.0.bottom/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1027@836.-1417.2560.1417" timestamp="1620245797888" />
-    <state width="1638" height="292" key="GridCell.Tab.0.center" timestamp="1620503439530">
+    <state width="1638" height="292" key="GridCell.Tab.0.center" timestamp="1620510101465">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
-    <state width="1638" height="292" key="GridCell.Tab.0.center/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@0.23.1680.1027" timestamp="1620503439530" />
+    <state width="1638" height="292" key="GridCell.Tab.0.center/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@0.23.1680.1027" timestamp="1620510101465" />
     <state width="2518" height="442" key="GridCell.Tab.0.center/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@836.-1417.2560.1417" timestamp="1620275464224" />
     <state width="1638" height="292" key="GridCell.Tab.0.center/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1002@0.23.1680.1002" timestamp="1620500571603" />
     <state width="2518" height="442" key="GridCell.Tab.0.center/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1002@836.-1417.2560.1417" timestamp="1620354337716" />
     <state width="2518" height="442" key="GridCell.Tab.0.center/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1027@836.-1417.2560.1417" timestamp="1620245797887" />
-    <state width="1638" height="292" key="GridCell.Tab.0.left" timestamp="1620503439529">
+    <state width="1638" height="292" key="GridCell.Tab.0.left" timestamp="1620510101465">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
-    <state width="1638" height="292" key="GridCell.Tab.0.left/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@0.23.1680.1027" timestamp="1620503439529" />
+    <state width="1638" height="292" key="GridCell.Tab.0.left/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@0.23.1680.1027" timestamp="1620510101465" />
     <state width="2518" height="442" key="GridCell.Tab.0.left/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@836.-1417.2560.1417" timestamp="1620275464223" />
     <state width="1638" height="292" key="GridCell.Tab.0.left/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1002@0.23.1680.1002" timestamp="1620500571603" />
     <state width="2518" height="442" key="GridCell.Tab.0.left/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1002@836.-1417.2560.1417" timestamp="1620354337716" />
     <state width="2518" height="442" key="GridCell.Tab.0.left/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1027@836.-1417.2560.1417" timestamp="1620245797886" />
-    <state width="1638" height="292" key="GridCell.Tab.0.right" timestamp="1620503439530">
+    <state width="1638" height="292" key="GridCell.Tab.0.right" timestamp="1620510101465">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
-    <state width="1638" height="292" key="GridCell.Tab.0.right/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@0.23.1680.1027" timestamp="1620503439530" />
+    <state width="1638" height="292" key="GridCell.Tab.0.right/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@0.23.1680.1027" timestamp="1620510101465" />
     <state width="2518" height="442" key="GridCell.Tab.0.right/-1724.-1417.2560.1392/836.-1417.2560.1417/0.23.1680.1027@836.-1417.2560.1417" timestamp="1620275464224" />
     <state width="1638" height="292" key="GridCell.Tab.0.right/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1002@0.23.1680.1002" timestamp="1620500571604" />
     <state width="2518" height="442" key="GridCell.Tab.0.right/-1724.-1417.2560.1417/836.-1417.2560.1417/0.23.1680.1002@836.-1417.2560.1417" timestamp="1620354337718" />
