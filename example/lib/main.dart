@@ -537,7 +537,7 @@ class LoggingAudioHandler extends CompositeAudioHandler {
 class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   // ignore: close_sinks
   final BehaviorSubject<List<MediaItem>> _recentSubject = BehaviorSubject<List<MediaItem>>();
-  // final _mediaLibrary = MediaLibrary();
+  //final _mediaLibrary = MediaLibrary();
   final _player = AudioPlayer();
 
   int? get index => _player.currentIndex;
@@ -548,7 +548,7 @@ class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler
 
   Future<void> _init() async {
     // Load and broadcast the queue
-    // queue.add(_mediaLibrary.items[MediaLibrary.albumsRootId]);
+    //queue.add(_mediaLibrary.items[MediaLibrary.albumsRootId]);
     // For Android 11, record the most recent item so it can be resumed.
     mediaItem.whereType<MediaItem>().listen((item) => _recentSubject.add([item]));
     // Broadcast media item changes.
@@ -561,20 +561,23 @@ class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler
     _player.processingStateStream.listen((state) {
       if (state == ProcessingState.completed) stop();
     });
-    try {
-      print("### _player.load");
+    /*try {
+      print("### _player.load 1");
       // After a cold restart (on Android), _player.load jumps straight from
       // the loading state to the completed state. Inserting a delay makes it
       // work. Not sure why!
+
       await Future.delayed(const Duration(seconds: 2), () => "2");
       //await Future.delayed(Duration(seconds: 2)); // magic delay
       await _player.setAudioSource(ConcatenatingAudioSource(
-        children: queue.value!.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
+        children: queue.value!
+            .map((item) => AudioSource.uri(Uri.parse(item.id)))
+            .toList(),
       ));
       print("### loaded");
     } catch (e) {
       print("Error: $e");
-    }
+    }*/
   }
 
   // @override
@@ -602,6 +605,25 @@ class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   //           as ValueStream<Map<String, dynamic>>;
   //   }
   // }
+
+  @override
+  Future<void> updateQueue(List<MediaItem> queue1) async {
+    try {
+      print("### _player.load 1");
+      // After a cold restart (on Android), _player.load jumps straight from
+      // the loading state to the completed state. Inserting a delay makes it
+      // work. Not sure why!
+
+      //await Future.delayed(Duration(seconds: 2)); // magic delay
+      await _player.setAudioSource(ConcatenatingAudioSource(
+        children: queue1.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
+      ));
+      print("### loaded");
+    } catch (e) {
+      print("Error: $e");
+    }
+    return super.updateQueue(queue1);
+  }
 
   @override
   Future<void> skipToQueueItem(int index) async {
@@ -696,38 +718,40 @@ class MediaLibrary {
   };
 }
 
-// class MediaLibrary2 {
-//   static const albumsRootId = 'albums';
-//
-//   final items = <String, List<MediaItem>>{
-//     AudioService.browsableRootId: const [
-//       MediaItem(
-//         id: albumsRootId,
-//         album: "",
-//         title: "Albums",
-//         playable: false,
-//       ),
-//     ],
-//     albumsRootId: [
-//       MediaItem(
-//         id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-//         album: "Science Friday",
-//         title: "A Salute To Head-Scratching Science",
-//         artist: "Science Friday and WNYC Studios",
-//         duration: const Duration(milliseconds: 5739820),
-//         artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
-//       ),
-//       MediaItem(
-//         id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
-//         album: "Science Friday",
-//         title: "From Cat Rheology To Operatic Incompetence",
-//         artist: "Science Friday and WNYC Studios",
-//         duration: const Duration(milliseconds: 2856950),
-//         artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
-//       ),
-//     ],
-//   };
-// }
+/*class MediaLibrary {
+  static const albumsRootId = 'albums';
+
+  final items = <String, List<MediaItem>>{
+    AudioService.browsableRootId: const [
+      MediaItem(
+        id: albumsRootId,
+        album: "",
+        title: "Albums",
+        playable: false,
+      ),
+    ],
+    albumsRootId: [
+      MediaItem(
+        id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
+        album: "Science Friday",
+        title: "A Salute To Head-Scratching Science",
+        artist: "Science Friday and WNYC Studios",
+        duration: const Duration(milliseconds: 5739820),
+        artUri: Uri.parse(
+            'https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+      ),
+      MediaItem(
+        id: 'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3',
+        album: "Science Friday",
+        title: "From Cat Rheology To Operatic Incompetence",
+        artist: "Science Friday and WNYC Studios",
+        duration: const Duration(milliseconds: 2856950),
+        artUri: Uri.parse(
+            'https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+      ),
+    ],
+  };
+}*/
 
 /// This task defines logic for speaking a sequence of numbers using
 /// text-to-speech.
@@ -735,7 +759,7 @@ class MediaLibrary {
 class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   // ignore: close_sinks
   final BehaviorSubject<List<MediaItem>> _recentSubject = BehaviorSubject<List<MediaItem>>();
-  // final _mediaLibrary = MediaLibrary();
+  //final _mediaLibrary = MediaLibrary();
   final _player = AudioPlayer();
 
   int? get index => _player.currentIndex;
@@ -759,19 +783,39 @@ class TextPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler 
     _player.processingStateStream.listen((state) {
       if (state == ProcessingState.completed) stop();
     });
-    try {
-      print("### _player.load");
+    /*try {
+      print("### _player.load 2");
       // After a cold restart (on Android), _player.load jumps straight from
       // the loading state to the completed state. Inserting a delay makes it
       // work. Not sure why!
       await Future.delayed(const Duration(seconds: 2), () => "2");
       await _player.setAudioSource(ConcatenatingAudioSource(
-        children: queue.value!.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
+        children: queue.value!
+            .map((item) => AudioSource.uri(Uri.parse(item.id)))
+            .toList(),
+      ));
+      print("### loaded");
+    } catch (e) {
+      print("Error: $e");
+    }*/
+  }
+
+  @override
+  Future<void> updateQueue(List<MediaItem> queue1) async {
+    try {
+      print("### _player.load 2");
+      // After a cold restart (on Android), _player.load jumps straight from
+      // the loading state to the completed state. Inserting a delay makes it
+      // work. Not sure why!
+      //await Future.delayed(const Duration(seconds: 2), () => "2");
+      await _player.setAudioSource(ConcatenatingAudioSource(
+        children: queue1.map((item) => AudioSource.uri(Uri.parse(item.id))).toList(),
       ));
       print("### loaded");
     } catch (e) {
       print("Error: $e");
     }
+    return super.updateQueue(queue1);
   }
 
   // @override
